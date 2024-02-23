@@ -1,12 +1,21 @@
+import { Collection } from "@/components/shared/collection";
 import { navLinks } from "@/constants";
+import { getAllImages } from "@/lib/actions/image.actions";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home({ searchParams }: SearchParamProps) {
+  const page = Number(searchParams?.page) || 1;
+  const searchQuery = (searchParams?.query as string) || "";
+
+  const images = await getAllImages({ page, searchQuery });
+
   return (
     <>
       <section className="home">
-        <h1>Unleash Your Creative Vision with Magnify</h1>
+        <h1 className="home-heading">
+          Unleash Your Creative Vision with Magnify
+        </h1>
 
         <ul className="flex-center w-full gap-20">
           {navLinks.slice(1, 5).map((link) => (
@@ -23,6 +32,15 @@ export default function Home() {
             </Link>
           ))}
         </ul>
+      </section>
+
+      <section className="sm:mt-12">
+        <Collection
+          images={images?.data}
+          hasSearch={true}
+          totalPages={images?.totalPages}
+          page={page}
+        />
       </section>
     </>
   );
